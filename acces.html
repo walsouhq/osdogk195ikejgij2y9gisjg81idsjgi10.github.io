@@ -1,0 +1,2533 @@
+<!doctype html>
+<html lang="fr">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Vynguard Acces</title>
+        <style>
+            * {
+                margin: 0;
+                padding: 0;
+                box-sizing: border-box;
+            }
+
+            :root {
+                --glass: 0;
+                --bg-image: none;
+                --bg-blur: 0px;
+                --primary-1: #8b5cf6;
+                --primary-2: #6d28d9;
+            }
+
+            [data-theme="violet"] {
+                --primary-1: #8b5cf6;
+                --primary-2: #6d28d9;
+            }
+
+            [data-theme="blue"] {
+                --primary-1: #3b82f6;
+                --primary-2: #1e40af;
+            }
+
+            [data-theme="green"] {
+                --primary-1: #10b981;
+                --primary-2: #047857;
+            }
+
+            [data-theme="pink"] {
+                --primary-1: #ec4899;
+                --primary-2: #be185d;
+            }
+
+            [data-theme="orange"] {
+                --primary-1: #f97316;
+                --primary-2: #c2410c;
+            }
+
+            body {
+                font-family:
+                    -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+                    Oxygen, Ubuntu, Cantarell, sans-serif;
+                background: linear-gradient(135deg, #0a0a1a 0%, #1a1a3e 100%);
+                color: #fff;
+                min-height: 100vh;
+                overflow-x: hidden;
+                position: relative;
+            }
+
+            body::before {
+                content: "";
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background-image: var(--bg-image);
+                background-size: cover;
+                background-position: center;
+                background-repeat: no-repeat;
+                filter: blur(var(--bg-blur));
+                z-index: -1;
+            }
+
+            .container {
+                display: flex;
+                min-height: 100vh;
+            }
+
+            /* Sidebar */
+            .sidebar {
+                width: 230px;
+                background: rgba(15, 15, 35, calc(0.8 - var(--glass)));
+                backdrop-filter: blur(10px);
+                padding: 20px;
+                border-right: 1px solid rgba(139, 92, 246, 0.1);
+            }
+
+            .logo {
+                display: flex;
+                align-items: center;
+                gap: 10px;
+                margin-bottom: 30px;
+                font-size: 20px;
+                font-weight: bold;
+            }
+
+            .logo svg {
+                width: 24px;
+                height: 24px;
+                fill: var(--primary-1);
+            }
+
+            .menu-item {
+                display: flex;
+                align-items: center;
+                gap: 12px;
+                padding: 12px 16px;
+                margin-bottom: 8px;
+                border-radius: 8px;
+                cursor: pointer;
+                transition: all 0.3s ease;
+                color: #9ca3af;
+                position: relative;
+                overflow: hidden;
+            }
+
+            .menu-item:hover {
+                background: rgba(139, 92, 246, 0.1);
+                color: #fff;
+                transform: translateX(5px);
+            }
+
+            .menu-item.active {
+                background: rgba(139, 92, 246, 0.2);
+                color: #fff;
+            }
+
+            /* Ripple Effect */
+            .ripple-effect {
+                position: absolute;
+                border-radius: 50%;
+                background: rgba(255, 255, 255, 0.3);
+                transform: scale(0);
+                animation: ripple 0.6s ease-out;
+                pointer-events: none;
+            }
+
+            @keyframes ripple {
+                to {
+                    transform: scale(4);
+                    opacity: 0;
+                }
+            }
+
+            /* Main Content */
+            .main-content {
+                flex: 1;
+                padding: 40px;
+            }
+
+            .page {
+                display: none;
+                animation: fadeIn 0.5s ease;
+            }
+
+            .page.active {
+                display: block;
+            }
+
+            @keyframes fadeIn {
+                from {
+                    opacity: 0;
+                    transform: translateY(20px);
+                }
+                to {
+                    opacity: 1;
+                    transform: translateY(0);
+                }
+            }
+
+            /* Search Page */
+            .search-header {
+                text-align: center;
+                margin-bottom: 40px;
+            }
+
+            .search-box {
+                max-width: 900px;
+                margin: 0 auto 30px;
+                position: relative;
+            }
+
+            .search-input {
+                width: 100%;
+                padding: 18px 24px;
+                background: rgba(30, 30, 60, calc(0.6 - var(--glass)));
+                border: 2px solid rgba(139, 92, 246, 0.3);
+                border-radius: 12px;
+                color: #fff;
+                font-size: 16px;
+                transition: all 0.3s ease;
+            }
+
+            .search-input:focus {
+                outline: none;
+                border-color: var(--primary-1);
+                box-shadow: 0 0 20px rgba(139, 92, 246, 0.3);
+            }
+
+            .search-btn {
+                position: absolute;
+                right: 10px;
+                top: 50%;
+                transform: translateY(-50%);
+                padding: 12px 32px;
+                background: linear-gradient(
+                    135deg,
+                    var(--primary-1) 0%,
+                    var(--primary-2) 100%
+                );
+                border: none;
+                border-radius: 8px;
+                color: #fff;
+                font-weight: bold;
+                cursor: pointer;
+                transition: all 0.3s ease;
+            }
+
+            .search-btn:hover:not(:disabled) {
+                transform: translateY(-50%) scale(1.05);
+                box-shadow: 0 5px 20px rgba(139, 92, 246, 0.4);
+            }
+
+            .search-btn:disabled {
+                opacity: 0.5;
+                cursor: not-allowed;
+            }
+
+            .hint {
+                font-size: 12px;
+                color: #ef4444;
+                margin-top: 8px;
+                text-align: center;
+            }
+
+            /* Nouveau style pour la boîte de résultats */
+            .results-summary {
+                background: rgba(30, 30, 60, calc(0.5 - var(--glass)));
+                border: 1px solid rgba(139, 92, 246, 0.2);
+                border-radius: 12px;
+                padding: 20px;
+                margin: 30px auto;
+                max-width: 900px;
+                display: flex;
+                align-items: center;
+                gap: 20px;
+                animation: fadeIn 0.5s ease;
+            }
+
+            .rocket-icon {
+                font-size: 32px;
+                animation: float 3s ease-in-out infinite;
+            }
+
+            @keyframes float {
+                0%,
+                100% {
+                    transform: translateY(0);
+                }
+                50% {
+                    transform: translateY(-10px);
+                }
+            }
+
+            .summary-content {
+                flex: 1;
+            }
+
+            .summary-title {
+                font-size: 18px;
+                font-weight: bold;
+                color: var(--primary-1);
+                margin-bottom: 5px;
+            }
+
+            .summary-stats {
+                display: flex;
+                gap: 15px;
+                font-size: 14px;
+                color: #9ca3af;
+            }
+
+            .stat-item {
+                display: flex;
+                align-items: center;
+                gap: 5px;
+            }
+
+            .stat-number {
+                color: #fff;
+                font-weight: bold;
+                font-size: 16px;
+            }
+
+            /* Results */
+            .results {
+                max-width: 900px;
+                margin: 30px auto 0;
+            }
+
+            .result-item {
+                background: rgba(20, 20, 40, calc(0.6 - var(--glass)));
+                border: 1px solid rgba(139, 92, 246, 0.15);
+                border-radius: 12px;
+                padding: 20px;
+                margin-bottom: 16px;
+                transition: all 0.3s ease;
+            }
+
+            .result-item:hover {
+                border-color: var(--primary-1);
+                transform: translateX(5px);
+            }
+
+            .result-header {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                margin-bottom: 12px;
+                padding-bottom: 12px;
+                border-bottom: 1px solid rgba(139, 92, 246, 0.1);
+            }
+
+            .result-source {
+                color: var(--primary-1);
+                font-weight: bold;
+                font-size: 18px;
+            }
+
+            .export-buttons {
+                display: flex;
+                gap: 8px;
+            }
+
+            .export-btn {
+                padding: 6px 12px;
+                background: rgba(139, 92, 246, 0.2);
+                border: 1px solid var(--primary-1);
+                border-radius: 6px;
+                color: var(--primary-1);
+                cursor: pointer;
+                transition: all 0.3s ease;
+                font-size: 12px;
+            }
+
+            .export-btn:hover {
+                background: var(--primary-1);
+                color: #fff;
+            }
+
+            .result-data {
+                color: #d1d5db;
+                line-height: 1.6;
+            }
+
+            .data-field {
+                margin-bottom: 8px;
+                padding: 8px;
+                background: rgba(0, 0, 0, 0.2);
+                border-radius: 6px;
+                border-left: 3px solid var(--primary-1);
+            }
+
+            .field-name {
+                font-weight: bold;
+                color: #8b5cf6;
+                margin-right: 10px;
+            }
+
+            /* Tools Page */
+            .tools-grid {
+                display: grid;
+                grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+                gap: 30px;
+            }
+
+            .tool-section {
+                background: rgba(30, 30, 60, calc(0.5 - var(--glass)));
+                border: 1px solid rgba(139, 92, 246, 0.2);
+                border-radius: 16px;
+                padding: 30px;
+            }
+
+            .tool-title {
+                font-size: 20px;
+                margin-bottom: 20px;
+                color: var(--primary-1);
+            }
+
+            .input-group {
+                margin-bottom: 20px;
+            }
+
+            .input-label {
+                display: block;
+                margin-bottom: 8px;
+                color: #9ca3af;
+                font-size: 14px;
+            }
+
+            .input-field {
+                width: 100%;
+                padding: 12px 16px;
+                background: rgba(20, 20, 40, calc(0.6 - var(--glass)));
+                border: 1px solid rgba(139, 92, 246, 0.3);
+                border-radius: 8px;
+                color: #fff;
+                font-size: 14px;
+                transition: all 0.3s ease;
+            }
+
+            .input-field:focus {
+                outline: none;
+                border-color: var(--primary-1);
+            }
+
+            .tool-btn {
+                width: 100%;
+                padding: 14px;
+                background: linear-gradient(
+                    135deg,
+                    var(--primary-1) 0%,
+                    var(--primary-2) 100%
+                );
+                border: none;
+                border-radius: 8px;
+                color: #fff;
+                font-weight: bold;
+                cursor: pointer;
+                transition: all 0.3s ease;
+                position: relative;
+                overflow: hidden;
+            }
+
+            .tool-btn:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 5px 20px rgba(139, 92, 246, 0.4);
+            }
+
+            /* ARBRE GÉNÉALOGIQUE STYLES */
+            .tree-container {
+                position: relative;
+                min-height: 600px;
+                background: rgba(15, 15, 35, calc(0.6 - var(--glass)));
+                border-radius: 16px;
+                padding: 30px;
+                overflow: auto;
+            }
+
+            .tree-controls {
+                display: flex;
+                gap: 10px;
+                margin-bottom: 20px;
+                flex-wrap: wrap;
+            }
+
+            .tree-btn {
+                padding: 10px 20px;
+                background: rgba(139, 92, 246, 0.2);
+                border: 1px solid var(--primary-1);
+                border-radius: 8px;
+                color: var(--primary-1);
+                cursor: pointer;
+                transition: all 0.3s ease;
+                font-size: 14px;
+            }
+
+            .tree-btn:hover {
+                background: var(--primary-1);
+                color: #fff;
+            }
+
+            .tree-wrapper {
+                position: relative;
+                padding: 40px;
+                min-height: 500px;
+            }
+
+            .person-node {
+                position: absolute;
+                background: rgba(30, 30, 60, calc(0.7 - var(--glass)));
+                border: 2px solid var(--primary-1);
+                border-radius: 10px;
+                padding: 15px;
+                width: 220px;
+                cursor: pointer;
+                transition: all 0.3s ease;
+                box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+                z-index: 10;
+            }
+
+            .person-node:hover {
+                transform: scale(1.05);
+                box-shadow: 0 6px 20px rgba(139, 92, 246, 0.4);
+                z-index: 20;
+            }
+
+            .person-node.male {
+                border-color: #3b82f6;
+            }
+
+            .person-node.female {
+                border-color: #ec4899;
+            }
+
+            .person-header {
+                display: flex;
+                align-items: center;
+                gap: 10px;
+                margin-bottom: 10px;
+                padding-bottom: 10px;
+                border-bottom: 1px solid rgba(139, 92, 246, 0.2);
+            }
+
+            .person-gender {
+                font-size: 18px;
+            }
+
+            .person-name {
+                font-size: 16px;
+                font-weight: bold;
+                color: var(--primary-1);
+            }
+
+            .person-details {
+                font-size: 12px;
+                color: #9ca3af;
+                line-height: 1.4;
+            }
+
+            .person-detail {
+                margin-bottom: 4px;
+                display: flex;
+                align-items: center;
+                gap: 5px;
+            }
+
+            .person-actions {
+                display: flex;
+                gap: 5px;
+                margin-top: 10px;
+                justify-content: flex-end;
+            }
+
+            .person-action-btn {
+                padding: 4px 8px;
+                background: rgba(139, 92, 246, 0.1);
+                border: 1px solid var(--primary-1);
+                border-radius: 4px;
+                color: var(--primary-1);
+                cursor: pointer;
+                font-size: 10px;
+                transition: all 0.3s ease;
+            }
+
+            .person-action-btn:hover {
+                background: var(--primary-1);
+                color: #fff;
+            }
+
+            .connection-line {
+                position: absolute;
+                background: var(--primary-1);
+                z-index: 1;
+                pointer-events: none;
+            }
+
+            .connection-line.horizontal {
+                height: 2px;
+            }
+
+            .connection-line.vertical {
+                width: 2px;
+            }
+
+            /* Modal pour ajouter/modifier une personne */
+            .modal-overlay {
+                position: fixed;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background: rgba(0, 0, 0, 0.8);
+                display: none;
+                justify-content: center;
+                align-items: center;
+                z-index: 1000;
+            }
+
+            .modal-overlay.active {
+                display: flex;
+            }
+
+            .modal-content {
+                background: rgba(20, 20, 40, 0.95);
+                border: 1px solid var(--primary-1);
+                border-radius: 12px;
+                padding: 30px;
+                width: 90%;
+                max-width: 500px;
+                max-height: 80vh;
+                overflow-y: auto;
+            }
+
+            .modal-header {
+                margin-bottom: 20px;
+                padding-bottom: 15px;
+                border-bottom: 1px solid rgba(139, 92, 246, 0.2);
+            }
+
+            .modal-title {
+                font-size: 20px;
+                color: var(--primary-1);
+            }
+
+            .modal-form {
+                display: grid;
+                grid-template-columns: 1fr 1fr;
+                gap: 15px;
+            }
+
+            .modal-full-width {
+                grid-column: 1 / -1;
+            }
+
+            .gender-selector {
+                display: flex;
+                gap: 10px;
+                margin-bottom: 15px;
+            }
+
+            .gender-option {
+                flex: 1;
+                padding: 10px;
+                text-align: center;
+                background: rgba(139, 92, 246, 0.1);
+                border: 1px solid var(--primary-1);
+                border-radius: 6px;
+                cursor: pointer;
+                transition: all 0.3s ease;
+            }
+
+            .gender-option.selected {
+                background: var(--primary-1);
+                color: #fff;
+            }
+
+            .gender-option:hover {
+                background: var(--primary-1);
+                color: #fff;
+            }
+
+            .modal-actions {
+                display: flex;
+                gap: 10px;
+                margin-top: 20px;
+                grid-column: 1 / -1;
+            }
+
+            .modal-btn {
+                flex: 1;
+                padding: 12px;
+                border-radius: 6px;
+                border: none;
+                font-weight: bold;
+                cursor: pointer;
+                transition: all 0.3s ease;
+            }
+
+            .modal-btn.primary {
+                background: var(--primary-1);
+                color: #fff;
+            }
+
+            .modal-btn.secondary {
+                background: rgba(139, 92, 246, 0.1);
+                border: 1px solid var(--primary-1);
+                color: var(--primary-1);
+            }
+
+            /* Toast */
+            #toast {
+                position: fixed;
+                bottom: 30px;
+                right: 30px;
+                background: rgba(20, 20, 40, 0.95);
+                border: 1px solid var(--primary-1);
+                padding: 16px 24px;
+                border-radius: 8px;
+                box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+                opacity: 0;
+                transform: translateY(20px);
+                transition: all 0.3s ease;
+                z-index: 10000;
+                pointer-events: none;
+            }
+
+            #toast.show {
+                opacity: 1;
+                transform: translateY(0);
+            }
+
+            /* Settings Page */
+            .settings-tabs {
+                display: flex;
+                gap: 10px;
+                margin-bottom: 30px;
+                border-bottom: 1px solid rgba(139, 92, 246, 0.2);
+            }
+
+            .settings-tab {
+                padding: 12px 24px;
+                cursor: pointer;
+                border-bottom: 2px solid transparent;
+                transition: all 0.3s ease;
+                color: #9ca3af;
+            }
+
+            .settings-tab:hover {
+                color: #fff;
+            }
+
+            .settings-tab.active {
+                color: var(--primary-1);
+                border-bottom-color: var(--primary-1);
+            }
+
+            .settings-content {
+                display: none;
+            }
+
+            .theme-customizer {
+                max-width: 800px;
+            }
+
+            .color-swatches {
+                display: flex;
+                gap: 15px;
+                margin: 20px 0;
+                flex-wrap: wrap;
+            }
+
+            .color-swatch {
+                width: 50px;
+                height: 50px;
+                border-radius: 12px;
+                cursor: pointer;
+                border: 3px solid transparent;
+                transition: all 0.3s ease;
+            }
+
+            .color-swatch:hover {
+                transform: scale(1.1);
+            }
+
+            .color-swatch.active {
+                border-color: #fff;
+                box-shadow: 0 0 20px rgba(255, 255, 255, 0.5);
+            }
+
+            .slider-group {
+                margin: 30px 0;
+            }
+
+            .slider-label {
+                display: flex;
+                justify-content: space-between;
+                margin-bottom: 10px;
+                color: #d1d5db;
+            }
+
+            input[type="range"] {
+                width: 100%;
+                height: 6px;
+                border-radius: 3px;
+                background: rgba(139, 92, 246, 0.2);
+                outline: none;
+                -webkit-appearance: none;
+            }
+
+            input[type="range"]::-webkit-slider-thumb {
+                -webkit-appearance: none;
+                appearance: none;
+                width: 20px;
+                height: 20px;
+                border-radius: 50%;
+                background: var(--primary-1);
+                cursor: pointer;
+                box-shadow: 0 0 10px var(--primary-1);
+            }
+
+            input[type="range"]::-moz-range-thumb {
+                width: 20px;
+                height: 20px;
+                border-radius: 50%;
+                background: var(--primary-1);
+                cursor: pointer;
+                border: none;
+                box-shadow: 0 0 10px var(--primary-1);
+            }
+
+            .theme-actions {
+                display: flex;
+                gap: 15px;
+                margin-top: 30px;
+            }
+
+            .theme-actions button {
+                flex: 1;
+                padding: 14px;
+                border: none;
+                border-radius: 8px;
+                font-weight: bold;
+                cursor: pointer;
+                transition: all 0.3s ease;
+            }
+
+            #theme-apply {
+                background: linear-gradient(
+                    135deg,
+                    var(--primary-1) 0%,
+                    var(--primary-2) 100%
+                );
+                color: #fff;
+            }
+
+            #theme-reset {
+                background: rgba(239, 68, 68, 0.2);
+                border: 1px solid #ef4444;
+                color: #fca5a5;
+            }
+        </style>
+    </head>
+    <body>
+        <div class="container">
+            <!-- Sidebar -->
+            <div class="sidebar">
+                <div class="logo">
+                    <svg viewBox="0 0 24 24">
+                        <path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                    </svg>
+                    Vynguard
+                </div>
+                <div class="menu-item active" data-page="recherche">
+                    🔍 Recherche
+                </div>
+                <div class="menu-item" data-page="outils">🛠️ Outils</div>
+                <div class="menu-item" data-page="genealogie">
+                    👨‍👩‍👧‍👦 Arbre Généalogique
+                </div>
+                <div class="menu-item" data-page="parametres">
+                    ⚙️ Paramètres
+                </div>
+            </div>
+
+            <!-- Main Content -->
+            <div class="main-content">
+                <!-- Recherche Page -->
+                <div class="page active" id="recherche">
+                    <div class="search-header">
+                        <h1>🔍 Bienvenue dans Vynguard Acces</h1>
+                        <p style="color: #9ca3af; margin-top: 10px">
+                            commence par une recherche ci-dessous.
+                        </p>
+                    </div>
+
+                    <form id="searchForm" onsubmit="return false;">
+                        <div class="search-box">
+                            <input
+                                type="text"
+                                class="search-input"
+                                id="q"
+                                placeholder="Tape au moins 3 caractères (sans caractères spéciaux)..."
+                            />
+                            <button
+                                type="button"
+                                class="search-btn"
+                                id="btnSearch"
+                                onclick="performSearch()"
+                            >
+                                Rechercher
+                            </button>
+                        </div>
+                        <div class="hint" id="hint"></div>
+                    </form>
+
+                    <div id="searchResults"></div>
+                </div>
+
+                <!-- Outils Page -->
+                <div class="page" id="outils">
+                    <h1 style="margin-bottom: 30px">🛠️ Outils</h1>
+                    <div class="tools-grid">
+                        <!-- Détection d'opérateur -->
+                        <div class="tool-section">
+                            <h2 class="tool-title">📱 Détection d'opérateur</h2>
+                            <div class="input-group">
+                                <label class="input-label"
+                                    >Numéro (MSISDN)</label
+                                >
+                                <input
+                                    type="text"
+                                    class="input-field"
+                                    id="msisdnInput"
+                                    placeholder="0624532756"
+                                />
+                            </div>
+                            <div class="input-group">
+                                <label class="input-label">IMSI</label>
+                                <input
+                                    type="text"
+                                    class="input-field"
+                                    id="imsiInput"
+                                    placeholder="20801..."
+                                />
+                            </div>
+                            <div class="input-group">
+                                <label class="input-label">ICCID</label>
+                                <input
+                                    type="text"
+                                    class="input-field"
+                                    id="iccidInput"
+                                    placeholder="8933..."
+                                />
+                            </div>
+                            <button
+                                class="tool-btn"
+                                onclick="identifyOperator()"
+                            >
+                                Identifier 📞
+                            </button>
+                            <p class="hint" style="color: #6b7280">
+                                Astuce : IMSI = fiable, ICCID = indicé, numéro =
+                                variable (portabilité).
+                            </p>
+                            <div id="operatorResult"></div>
+                        </div>
+
+                        <!-- Analyse IBAN -->
+                        <div class="tool-section">
+                            <h2 class="tool-title">🏦 Analyse IBAN</h2>
+                            <div class="input-group">
+                                <label class="input-label">IBAN</label>
+                                <input
+                                    type="text"
+                                    class="input-field"
+                                    id="ibanInput"
+                                    placeholder="FR76 1234 5678 9012 3456 7890 123"
+                                />
+                            </div>
+                            <button class="tool-btn" onclick="analyzeIBAN()">
+                                Analyser 🔍
+                            </button>
+                            <p class="hint" style="color: #6b7280">
+                                Entrez un IBAN pour obtenir des informations
+                                détaillées (pays, validité, décomposition pour
+                                la France).
+                            </p>
+                            <div id="ibanResult"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Arbre Généalogique Page -->
+                <div class="page" id="genealogie">
+                    <h1 style="margin-bottom: 30px">👨‍👩‍👧‍👦 Arbre Généalogique</h1>
+
+                    <div class="tree-controls">
+                        <button class="tree-btn" onclick="openAddPersonModal()">
+                            ➕ Ajouter une personne
+                        </button>
+                        <button class="tree-btn" onclick="addParentNode()">
+                            👴 Ajouter un parent
+                        </button>
+                        <button class="tree-btn" onclick="addChildNode()">
+                            👶 Ajouter un enfant
+                        </button>
+                        <button class="tree-btn" onclick="exportFamilyTree()">
+                            💾 Exporter (.1337)
+                        </button>
+                        <button class="tree-btn" onclick="importFamilyTree()">
+                            📁 Importer (.1337)
+                        </button>
+                        <input
+                            type="file"
+                            id="treeFileInput"
+                            accept=".1337"
+                            style="display: none"
+                        />
+                    </div>
+
+                    <div class="tree-container">
+                        <div class="tree-wrapper" id="treeWrapper">
+                            <!-- Les noeuds seront ajoutés ici dynamiquement -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Paramètres Page -->
+                <div class="page" id="parametres">
+                    <h1 style="margin-bottom: 30px">⚙️ Paramètres</h1>
+
+                    <div class="settings-tabs">
+                        <div class="settings-tab active" data-tab="theme">
+                            🎨 Thème
+                        </div>
+                        <div class="settings-tab" data-tab="background">
+                            🖼️ Fond d'écran
+                        </div>
+                    </div>
+
+                    <!-- Theme Tab -->
+                    <div
+                        class="settings-content"
+                        data-content="theme"
+                        style="display: block"
+                    >
+                        <div class="theme-customizer">
+                            <h3
+                                style="
+                                    margin-bottom: 15px;
+                                    color: var(--primary-1);
+                                "
+                            >
+                                Couleur du thème
+                            </h3>
+                            <div class="color-swatches">
+                                <div
+                                    class="color-swatch active"
+                                    data-theme="violet"
+                                    data-color1="#8b5cf6"
+                                    data-color2="#6d28d9"
+                                    style="
+                                        background: linear-gradient(
+                                            135deg,
+                                            #8b5cf6,
+                                            #6d28d9
+                                        );
+                                    "
+                                ></div>
+                                <div
+                                    class="color-swatch"
+                                    data-theme="blue"
+                                    data-color1="#3b82f6"
+                                    data-color2="#1e40af"
+                                    style="
+                                        background: linear-gradient(
+                                            135deg,
+                                            #3b82f6,
+                                            #1e40af
+                                        );
+                                    "
+                                ></div>
+                                <div
+                                    class="color-swatch"
+                                    data-theme="green"
+                                    data-color1="#10b981"
+                                    data-color2="#047857"
+                                    style="
+                                        background: linear-gradient(
+                                            135deg,
+                                            #10b981,
+                                            #047857
+                                        );
+                                    "
+                                ></div>
+                                <div
+                                    class="color-swatch"
+                                    data-theme="pink"
+                                    data-color1="#ec4899"
+                                    data-color2="#be185d"
+                                    style="
+                                        background: linear-gradient(
+                                            135deg,
+                                            #ec4899,
+                                            #be185d
+                                        );
+                                    "
+                                ></div>
+                                <div
+                                    class="color-swatch"
+                                    data-theme="orange"
+                                    data-color1="#f97316"
+                                    data-color2="#c2410c"
+                                    style="
+                                        background: linear-gradient(
+                                            135deg,
+                                            #f97316,
+                                            #c2410c
+                                        );
+                                    "
+                                ></div>
+                            </div>
+
+                            <div class="slider-group">
+                                <div class="slider-label">
+                                    <span>Transparence</span>
+                                    <span id="transparency-value">0%</span>
+                                </div>
+                                <input
+                                    type="range"
+                                    id="transparency-range"
+                                    min="0"
+                                    max="100"
+                                    value="0"
+                                />
+                            </div>
+
+                            <div class="theme-actions">
+                                <button id="theme-reset">Réinitialiser</button>
+                                <button id="theme-apply">Appliquer</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Background Tab -->
+                    <div class="settings-content" data-content="background">
+                        <div class="theme-customizer">
+                            <h3
+                                style="
+                                    margin-bottom: 15px;
+                                    color: var(--primary-1);
+                                "
+                            >
+                                Fond d'écran personnalisé
+                            </h3>
+                            <input
+                                type="file"
+                                id="bg-file-new"
+                                accept="image/*"
+                                style="display: none"
+                            />
+                            <button class="tool-btn" id="bg-choose-new">
+                                Choisir une image
+                            </button>
+
+                            <div class="slider-group" style="margin-top: 30px">
+                                <div class="slider-label">
+                                    <span>Flou de l'arrière-plan</span>
+                                    <span id="blur-value">0px</span>
+                                </div>
+                                <input
+                                    type="range"
+                                    id="blur-range"
+                                    min="0"
+                                    max="20"
+                                    value="0"
+                                />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Modal pour ajouter/modifier une personne -->
+        <div class="modal-overlay" id="personModal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2 class="modal-title" id="modalTitle">
+                        Ajouter une personne
+                    </h2>
+                </div>
+                <form id="personForm" onsubmit="return false;">
+                    <div class="gender-selector">
+                        <div
+                            class="gender-option selected"
+                            data-gender="male"
+                            onclick="selectGender('male')"
+                        >
+                            👨 Homme
+                        </div>
+                        <div
+                            class="gender-option"
+                            data-gender="female"
+                            onclick="selectGender('female')"
+                        >
+                            👩 Femme
+                        </div>
+                    </div>
+
+                    <div class="modal-form">
+                        <div class="input-group modal-full-width">
+                            <label class="input-label">Prénom *</label>
+                            <input
+                                type="text"
+                                class="input-field"
+                                id="modalPrenom"
+                                required
+                            />
+                        </div>
+
+                        <div class="input-group">
+                            <label class="input-label">Nom *</label>
+                            <input
+                                type="text"
+                                class="input-field"
+                                id="modalNom"
+                                required
+                            />
+                        </div>
+
+                        <div class="input-group">
+                            <label class="input-label">Date de naissance</label>
+                            <input
+                                type="date"
+                                class="input-field"
+                                id="modalBirthDate"
+                            />
+                        </div>
+
+                        <div class="input-group">
+                            <label class="input-label">Lieu de naissance</label>
+                            <input
+                                type="text"
+                                class="input-field"
+                                id="modalBirthPlace"
+                                placeholder="Ville, Pays"
+                            />
+                        </div>
+
+                        <div class="input-group modal-full-width">
+                            <label class="input-label">Email</label>
+                            <input
+                                type="email"
+                                class="input-field"
+                                id="modalEmail"
+                            />
+                        </div>
+
+                        <div class="input-group">
+                            <label class="input-label">Téléphone</label>
+                            <input
+                                type="tel"
+                                class="input-field"
+                                id="modalPhone"
+                            />
+                        </div>
+
+                        <div class="input-group">
+                            <label class="input-label">Profession</label>
+                            <input
+                                type="text"
+                                class="input-field"
+                                id="modalProfession"
+                            />
+                        </div>
+
+                        <div class="input-group modal-full-width">
+                            <label class="input-label">Adresse</label>
+                            <input
+                                type="text"
+                                class="input-field"
+                                id="modalAddress"
+                                placeholder="Adresse complète"
+                            />
+                        </div>
+
+                        <div class="input-group modal-full-width">
+                            <label class="input-label">Notes</label>
+                            <textarea
+                                class="input-field"
+                                id="modalNotes"
+                                rows="3"
+                                placeholder="Informations supplémentaires..."
+                            ></textarea>
+                        </div>
+                    </div>
+
+                    <div class="modal-actions">
+                        <button
+                            type="button"
+                            class="modal-btn secondary"
+                            onclick="closePersonModal()"
+                        >
+                            Annuler
+                        </button>
+                        <button
+                            type="submit"
+                            class="modal-btn primary"
+                            onclick="savePerson()"
+                        >
+                            Sauvegarder
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Toast -->
+        <div id="toast"></div>
+
+        <script>
+            (function () {
+                "use strict";
+
+                // Ripple effect
+                function createRipple(event) {
+                    const button = event.currentTarget;
+                    const ripple = document.createElement("span");
+                    const rect = button.getBoundingClientRect();
+                    const size = Math.max(rect.width, rect.height);
+                    const x = event.clientX - rect.left - size / 2;
+                    const y = event.clientY - rect.top - size / 2;
+
+                    ripple.style.width = ripple.style.height = size + "px";
+                    ripple.style.left = x + "px";
+                    ripple.style.top = y + "px";
+                    ripple.classList.add("ripple-effect");
+
+                    button.appendChild(ripple);
+                    setTimeout(() => ripple.remove(), 600);
+                }
+
+                function showToast(text) {
+                    const t = document.getElementById("toast");
+                    if (!t) return;
+                    t.innerHTML = text;
+                    t.classList.add("show");
+                    clearTimeout(window.__toastTimer);
+                    window.__toastTimer = setTimeout(
+                        () => t.classList.remove("show"),
+                        2000,
+                    );
+                }
+
+                // Navigation
+                window.addEventListener("DOMContentLoaded", function () {
+                    // Add ripple to buttons
+                    document
+                        .querySelectorAll(
+                            ".tool-btn, .search-btn, .menu-item, .tree-btn",
+                        )
+                        .forEach((btn) => {
+                            btn.addEventListener("click", createRipple);
+                        });
+
+                    // Navigation entre pages
+                    document.querySelectorAll(".menu-item").forEach((item) => {
+                        item.addEventListener("click", function () {
+                            document
+                                .querySelectorAll(".menu-item")
+                                .forEach((i) => i.classList.remove("active"));
+                            document
+                                .querySelectorAll(".page")
+                                .forEach((p) => p.classList.remove("active"));
+
+                            this.classList.add("active");
+                            const page = this.getAttribute("data-page");
+                            document
+                                .getElementById(page)
+                                .classList.add("active");
+                        });
+                    });
+
+                    // Search validation
+                    const SPECIALS = /[^0-9A-Za-zÀ-ÖØ-öø-ÿ@.+_\-\s]/;
+                    const q = document.getElementById("q");
+                    const btn = document.getElementById("btnSearch");
+                    const hint = document.getElementById("hint");
+
+                    function updateBtn() {
+                        if (!q || !btn) return;
+                        const val = (q.value || "").trim();
+                        const hasSpecial = SPECIALS.test(val);
+                        const short = val.length < 3;
+
+                        btn.disabled = short || hasSpecial;
+
+                        if (hint) {
+                            if (hasSpecial) {
+                                let msg =
+                                    "Retire les caractères spéciaux non autorisés";
+                                if (/\+/.test(val))
+                                    msg +=
+                                        " Pour un numéro, saisis 06… ou 336… (sans '+').";
+                                hint.textContent = msg;
+                            } else if (short) {
+                                hint.textContent =
+                                    "Entrez au moins 3 caractères pour rechercher.";
+                            } else {
+                                hint.textContent = "";
+                            }
+                        }
+                    }
+
+                    if (q && btn) {
+                        updateBtn();
+                        q.addEventListener("input", updateBtn);
+                    }
+
+                    // Enter key
+                    if (q) {
+                        q.addEventListener("keypress", function (e) {
+                            if (e.key === "Enter" && !btn.disabled) {
+                                performSearch();
+                            }
+                        });
+                    }
+
+                    // Settings tabs
+                    const settingsTabs =
+                        document.querySelectorAll(".settings-tab");
+                    const settingsContents =
+                        document.querySelectorAll(".settings-content");
+
+                    settingsTabs.forEach((tab) => {
+                        tab.addEventListener("click", () => {
+                            const targetTab = tab.getAttribute("data-tab");
+
+                            settingsTabs.forEach((t) =>
+                                t.classList.remove("active"),
+                            );
+                            settingsContents.forEach(
+                                (c) => (c.style.display = "none"),
+                            );
+
+                            tab.classList.add("active");
+                            const targetContent = document.querySelector(
+                                `[data-content="${targetTab}"]`,
+                            );
+                            if (targetContent) {
+                                targetContent.style.display = "block";
+                            }
+                        });
+                    });
+
+                    // Theme system
+                    const colorSwatches =
+                        document.querySelectorAll(".color-swatch");
+                    const blurRange = document.getElementById("blur-range");
+                    const transparencyRange =
+                        document.getElementById("transparency-range");
+                    const blurValue = document.getElementById("blur-value");
+                    const transparencyValue =
+                        document.getElementById("transparency-value");
+                    const bgFileNew = document.getElementById("bg-file-new");
+                    const bgChooseNew =
+                        document.getElementById("bg-choose-new");
+                    const themeReset = document.getElementById("theme-reset");
+                    const themeApply = document.getElementById("theme-apply");
+
+                    let currentTheme =
+                        localStorage.getItem("searcher_theme") || "violet";
+                    let currentBlur = parseInt(
+                        localStorage.getItem("searcher_blur") || "0",
+                    );
+                    let currentTransparency =
+                        parseFloat(
+                            localStorage.getItem("searcher_glass") || "0",
+                        ) * 100;
+                    let currentBgImage =
+                        localStorage.getItem("searcher_bg") || "none";
+
+                    // Load settings
+                    document.documentElement.setAttribute(
+                        "data-theme",
+                        currentTheme,
+                    );
+                    document.documentElement.style.setProperty(
+                        "--glass",
+                        String(currentTransparency / 100),
+                    );
+                    document.documentElement.style.setProperty(
+                        "--bg-blur",
+                        `${currentBlur}px`,
+                    );
+                    document.documentElement.style.setProperty(
+                        "--bg-image",
+                        currentBgImage,
+                    );
+
+                    if (blurRange) blurRange.value = currentBlur;
+                    if (transparencyRange)
+                        transparencyRange.value = currentTransparency;
+                    if (blurValue) blurValue.textContent = `${currentBlur}px`;
+                    if (transparencyValue)
+                        transparencyValue.textContent = `${Math.round(currentTransparency)}%`;
+
+                    colorSwatches.forEach((swatch) => {
+                        if (
+                            swatch.getAttribute("data-theme") === currentTheme
+                        ) {
+                            swatch.classList.add("active");
+                        }
+                    });
+
+                    // Color selection
+                    colorSwatches.forEach((swatch) => {
+                        swatch.addEventListener("click", () => {
+                            colorSwatches.forEach((s) =>
+                                s.classList.remove("active"),
+                            );
+                            swatch.classList.add("active");
+                            currentTheme = swatch.getAttribute("data-theme");
+                        });
+                    });
+
+                    // Blur slider
+                    if (blurRange && blurValue) {
+                        blurRange.addEventListener("input", () => {
+                            currentBlur = parseInt(blurRange.value);
+                            blurValue.textContent = `${currentBlur}px`;
+                        });
+                    }
+
+                    // Transparency slider
+                    if (transparencyRange && transparencyValue) {
+                        transparencyRange.addEventListener("input", () => {
+                            currentTransparency = parseInt(
+                                transparencyRange.value,
+                            );
+                            transparencyValue.textContent = `${currentTransparency}%`;
+                        });
+                    }
+
+                    // Background upload
+                    if (bgChooseNew && bgFileNew) {
+                        bgChooseNew.addEventListener("click", () =>
+                            bgFileNew.click(),
+                        );
+                        bgFileNew.addEventListener("change", () => {
+                            const file = bgFileNew.files && bgFileNew.files[0];
+                            if (!file) return;
+                            const reader = new FileReader();
+                            reader.onload = () => {
+                                currentBgImage = `url(${reader.result})`;
+                                showToast(
+                                    '<b>Image chargée</b> <small>Cliquez sur "Appliquer" pour sauvegarder</small>',
+                                );
+                            };
+                            reader.readAsDataURL(file);
+                        });
+                    }
+
+                    // Reset button
+                    if (themeReset) {
+                        themeReset.addEventListener("click", () => {
+                            currentTheme = "violet";
+                            currentBlur = 0;
+                            currentTransparency = 0;
+                            currentBgImage = "none";
+
+                            if (blurRange) blurRange.value = 0;
+                            if (transparencyRange) transparencyRange.value = 0;
+                            if (blurValue) blurValue.textContent = "0px";
+                            if (transparencyValue)
+                                transparencyValue.textContent = "0%";
+
+                            colorSwatches.forEach((swatch) => {
+                                swatch.classList.remove("active");
+                                if (
+                                    swatch.getAttribute("data-theme") ===
+                                    "violet"
+                                ) {
+                                    swatch.classList.add("active");
+                                }
+                            });
+
+                            showToast(
+                                '<b>Réinitialisé</b> <small>Cliquez sur "Appliquer" pour sauvegarder</small>',
+                            );
+                        });
+                    }
+
+                    // Apply button
+                    if (themeApply) {
+                        themeApply.addEventListener("click", () => {
+                            document.documentElement.setAttribute(
+                                "data-theme",
+                                currentTheme,
+                            );
+                            localStorage.setItem(
+                                "searcher_theme",
+                                currentTheme,
+                            );
+
+                            const glassValue = currentTransparency / 100;
+                            document.documentElement.style.setProperty(
+                                "--glass",
+                                String(glassValue),
+                            );
+                            localStorage.setItem(
+                                "searcher_glass",
+                                String(glassValue),
+                            );
+
+                            document.documentElement.style.setProperty(
+                                "--bg-blur",
+                                `${currentBlur}px`,
+                            );
+                            localStorage.setItem(
+                                "searcher_blur",
+                                String(currentBlur),
+                            );
+
+                            document.documentElement.style.setProperty(
+                                "--bg-image",
+                                currentBgImage,
+                            );
+                            localStorage.setItem("searcher_bg", currentBgImage);
+
+                            showToast(
+                                "<b>Thème appliqué</b> <small>Vos modifications ont été sauvegardées</small>",
+                            );
+                        });
+                    }
+
+                    // Charger l'arbre généalogique au démarrage
+                    loadFamilyTree();
+                });
+            })();
+
+            // ==================== ARBRE GÉNÉALOGIQUE ====================
+
+            // Données de l'arbre généalogique
+            let familyTree = {
+                people: [],
+                relationships: [],
+            };
+
+            let editingPersonId = null;
+            let selectedGender = "male";
+
+            // Fonction pour sélectionner le genre
+            function selectGender(gender) {
+                selectedGender = gender;
+                document
+                    .querySelectorAll(".gender-option")
+                    .forEach((option) => {
+                        option.classList.remove("selected");
+                        if (option.getAttribute("data-gender") === gender) {
+                            option.classList.add("selected");
+                        }
+                    });
+            }
+
+            // Ouvrir le modal pour ajouter une personne
+            function openAddPersonModal(personId = null) {
+                const modal = document.getElementById("personModal");
+                const modalTitle = document.getElementById("modalTitle");
+                const form = document.getElementById("personForm");
+
+                if (personId) {
+                    modalTitle.textContent = "Modifier la personne";
+                    editingPersonId = personId;
+
+                    // Remplir le formulaire avec les données existantes
+                    const person = familyTree.people.find(
+                        (p) => p.id === personId,
+                    );
+                    if (person) {
+                        document.getElementById("modalPrenom").value =
+                            person.firstName || "";
+                        document.getElementById("modalNom").value =
+                            person.lastName || "";
+                        document.getElementById("modalBirthDate").value =
+                            person.birthDate || "";
+                        document.getElementById("modalBirthPlace").value =
+                            person.birthPlace || "";
+                        document.getElementById("modalEmail").value =
+                            person.email || "";
+                        document.getElementById("modalPhone").value =
+                            person.phone || "";
+                        document.getElementById("modalProfession").value =
+                            person.profession || "";
+                        document.getElementById("modalAddress").value =
+                            person.address || "";
+                        document.getElementById("modalNotes").value =
+                            person.notes || "";
+                        selectGender(person.gender || "male");
+                    }
+                } else {
+                    modalTitle.textContent = "Ajouter une personne";
+                    editingPersonId = null;
+                    form.reset();
+                    selectGender("male");
+                }
+
+                modal.classList.add("active");
+            }
+
+            // Fermer le modal
+            function closePersonModal() {
+                document
+                    .getElementById("personModal")
+                    .classList.remove("active");
+                editingPersonId = null;
+            }
+
+            // Sauvegarder une personne
+            function savePerson() {
+                const firstName = document
+                    .getElementById("modalPrenom")
+                    .value.trim();
+                const lastName = document
+                    .getElementById("modalNom")
+                    .value.trim();
+
+                if (!firstName || !lastName) {
+                    alert("Le prénom et le nom sont obligatoires.");
+                    return;
+                }
+
+                const personData = {
+                    id: editingPersonId || generateId(),
+                    firstName,
+                    lastName,
+                    gender: selectedGender,
+                    birthDate:
+                        document.getElementById("modalBirthDate").value || "",
+                    birthPlace:
+                        document
+                            .getElementById("modalBirthPlace")
+                            .value.trim() || "",
+                    email:
+                        document.getElementById("modalEmail").value.trim() ||
+                        "",
+                    phone:
+                        document.getElementById("modalPhone").value.trim() ||
+                        "",
+                    profession:
+                        document
+                            .getElementById("modalProfession")
+                            .value.trim() || "",
+                    address:
+                        document.getElementById("modalAddress").value.trim() ||
+                        "",
+                    notes:
+                        document.getElementById("modalNotes").value.trim() ||
+                        "",
+                    position: editingPersonId
+                        ? familyTree.people.find(
+                              (p) => p.id === editingPersonId,
+                          )?.position || getDefaultPosition()
+                        : getDefaultPosition(),
+                };
+
+                if (editingPersonId) {
+                    // Mettre à jour la personne existante
+                    const index = familyTree.people.findIndex(
+                        (p) => p.id === editingPersonId,
+                    );
+                    if (index !== -1) {
+                        familyTree.people[index] = personData;
+                    }
+                } else {
+                    // Ajouter une nouvelle personne
+                    familyTree.people.push(personData);
+                }
+
+                saveFamilyTree();
+                renderTree();
+                closePersonModal();
+                showToast(
+                    editingPersonId
+                        ? "<b>Personne mise à jour</b>"
+                        : "<b>Personne ajoutée</b>",
+                );
+            }
+
+            // Générer un ID unique
+            function generateId() {
+                return (
+                    Date.now().toString(36) +
+                    Math.random().toString(36).substr(2)
+                );
+            }
+
+            // Obtenir une position par défaut
+            function getDefaultPosition() {
+                const wrapper = document.getElementById("treeWrapper");
+                if (!wrapper) return { x: 400, y: 300 };
+
+                const rect = wrapper.getBoundingClientRect();
+                return {
+                    x: rect.width / 2 - 110,
+                    y: rect.height / 2 - 80,
+                };
+            }
+
+            // Ajouter un parent
+            function addParentNode() {
+                if (familyTree.people.length === 0) {
+                    alert(
+                        "Ajoutez d'abord une personne avant d'ajouter un parent.",
+                    );
+                    return;
+                }
+
+                openAddPersonModal();
+            }
+
+            // Ajouter un enfant
+            function addChildNode() {
+                if (familyTree.people.length === 0) {
+                    alert(
+                        "Ajoutez d'abord une personne avant d'ajouter un enfant.",
+                    );
+                    return;
+                }
+
+                openAddPersonModal();
+            }
+
+            // Éditer une personne
+            function editPerson(personId) {
+                openAddPersonModal(personId);
+            }
+
+            // Supprimer une personne
+            function deletePerson(personId) {
+                if (
+                    !confirm(
+                        "Êtes-vous sûr de vouloir supprimer cette personne ?",
+                    )
+                ) {
+                    return;
+                }
+
+                // Supprimer la personne
+                familyTree.people = familyTree.people.filter(
+                    (p) => p.id !== personId,
+                );
+
+                // Supprimer les relations impliquant cette personne
+                familyTree.relationships = familyTree.relationships.filter(
+                    (rel) =>
+                        rel.parentId !== personId && rel.childId !== personId,
+                );
+
+                saveFamilyTree();
+                renderTree();
+                showToast("<b>Personne supprimée</b>");
+            }
+
+            // Rendre l'arbre
+            function renderTree() {
+                const wrapper = document.getElementById("treeWrapper");
+                if (!wrapper) return;
+
+                wrapper.innerHTML = "";
+
+                // Créer les noeuds des personnes
+                familyTree.people.forEach((person) => {
+                    createPersonNode(person);
+                });
+
+                // Créer les lignes de connexion
+                renderConnections();
+            }
+
+            // Créer un noeud de personne
+            function createPersonNode(person) {
+                const wrapper = document.getElementById("treeWrapper");
+                if (!wrapper) return;
+
+                const node = document.createElement("div");
+                node.className = `person-node ${person.gender}`;
+                node.id = `person-${person.id}`;
+                node.style.left = `${person.position.x}px`;
+                node.style.top = `${person.position.y}px`;
+
+                // Définir la couleur de bordure selon le genre
+                if (person.gender === "male") {
+                    node.style.borderColor = "#3b82f6";
+                } else {
+                    node.style.borderColor = "#ec4899";
+                }
+
+                // Rendu HTML du noeud
+                node.innerHTML = `
+                    <div class="person-header">
+                        <span class="person-gender">${person.gender === "male" ? "👨" : "👩"}</span>
+                        <span class="person-name">${person.firstName} ${person.lastName}</span>
+                    </div>
+                    <div class="person-details">
+                        ${person.birthDate ? `<div class="person-detail">📅 ${formatDate(person.birthDate)}</div>` : ""}
+                        ${person.birthPlace ? `<div class="person-detail">📍 ${person.birthPlace}</div>` : ""}
+                        ${person.profession ? `<div class="person-detail">💼 ${person.profession}</div>` : ""}
+                        ${person.email ? `<div class="person-detail">📧 ${person.email}</div>` : ""}
+                        ${person.phone ? `<div class="person-detail">📞 ${person.phone}</div>` : ""}
+                        ${person.address ? `<div class="person-detail">🏠 ${person.address}</div>` : ""}
+                        ${person.notes ? `<div class="person-detail">📝 ${person.notes.substring(0, 30)}${person.notes.length > 30 ? "..." : ""}</div>` : ""}
+                    </div>
+                    <div class="person-actions">
+                        <button class="person-action-btn" onclick="editPerson('${person.id}')">✏️</button>
+                        <button class="person-action-btn" onclick="deletePerson('${person.id}')">🗑️</button>
+                    </div>
+                `;
+
+                // Rendre le noeud déplaçable
+                makeDraggable(node, person.id);
+
+                wrapper.appendChild(node);
+            }
+
+            // Formater une date
+            function formatDate(dateString) {
+                if (!dateString) return "";
+                const date = new Date(dateString);
+                return date.toLocaleDateString("fr-FR");
+            }
+
+            // Rendre un élément déplaçable
+            function makeDraggable(element, personId) {
+                let isDragging = false;
+                let startX, startY, initialX, initialY;
+
+                element.addEventListener("mousedown", startDrag);
+
+                function startDrag(e) {
+                    isDragging = true;
+                    startX = e.clientX;
+                    startY = e.clientY;
+                    initialX = element.offsetLeft;
+                    initialY = element.offsetTop;
+
+                    document.addEventListener("mousemove", drag);
+                    document.addEventListener("mouseup", stopDrag);
+
+                    e.preventDefault();
+                }
+
+                function drag(e) {
+                    if (!isDragging) return;
+
+                    const dx = e.clientX - startX;
+                    const dy = e.clientY - startY;
+
+                    element.style.left = `${initialX + dx}px`;
+                    element.style.top = `${initialY + dy}px`;
+                }
+
+                function stopDrag() {
+                    if (!isDragging) return;
+
+                    isDragging = false;
+
+                    // Mettre à jour la position dans les données
+                    const person = familyTree.people.find(
+                        (p) => p.id === personId,
+                    );
+                    if (person) {
+                        person.position = {
+                            x: parseInt(element.style.left),
+                            y: parseInt(element.style.top),
+                        };
+                        saveFamilyTree();
+                    }
+
+                    document.removeEventListener("mousemove", drag);
+                    document.removeEventListener("mouseup", stopDrag);
+
+                    // Re-render les connections
+                    renderConnections();
+                }
+            }
+
+            // Rendre les connections
+            function renderConnections() {
+                // Supprimer les anciennes lignes
+                document
+                    .querySelectorAll(".connection-line")
+                    .forEach((line) => line.remove());
+
+                // Pour simplifier, on connecte les parents et enfants
+                // Dans une version avancée, on utiliserait les relations stockées
+                familyTree.relationships.forEach((relationship) => {
+                    const parentNode = document.getElementById(
+                        `person-${relationship.parentId}`,
+                    );
+                    const childNode = document.getElementById(
+                        `person-${relationship.childId}`,
+                    );
+
+                    if (parentNode && childNode) {
+                        drawConnection(parentNode, childNode);
+                    }
+                });
+            }
+
+            // Dessiner une connection
+            function drawConnection(fromNode, toNode) {
+                const wrapper = document.getElementById("treeWrapper");
+                if (!wrapper) return;
+
+                const fromRect = fromNode.getBoundingClientRect();
+                const toRect = toNode.getBoundingClientRect();
+                const wrapperRect = wrapper.getBoundingClientRect();
+
+                // Calculer les positions relatives
+                const fromX =
+                    fromRect.left + fromRect.width / 2 - wrapperRect.left;
+                const fromY = fromRect.top + fromRect.height - wrapperRect.top;
+                const toX = toRect.left + toRect.width / 2 - wrapperRect.left;
+                const toY = toRect.top - wrapperRect.top;
+
+                // Créer la ligne verticale du parent au point médian
+                const verticalLine = document.createElement("div");
+                verticalLine.className = "connection-line vertical";
+                verticalLine.style.left = `${fromX}px`;
+                verticalLine.style.top = `${fromY}px`;
+                verticalLine.style.height = "50px";
+                wrapper.appendChild(verticalLine);
+
+                // Créer la ligne horizontale
+                const horizontalLine = document.createElement("div");
+                horizontalLine.className = "connection-line horizontal";
+                const midY = fromY + 50;
+                horizontalLine.style.left = `${Math.min(fromX, toX)}px`;
+                horizontalLine.style.top = `${midY}px`;
+                horizontalLine.style.width = `${Math.abs(toX - fromX)}px`;
+                wrapper.appendChild(horizontalLine);
+
+                // Créer la ligne verticale du point médian à l'enfant
+                const verticalLine2 = document.createElement("div");
+                verticalLine2.className = "connection-line vertical";
+                verticalLine2.style.left = `${toX}px`;
+                verticalLine2.style.top = `${midY}px`;
+                verticalLine2.style.height = `${toY - midY}px`;
+                wrapper.appendChild(verticalLine2);
+            }
+
+            // Sauvegarder l'arbre dans le localStorage
+            function saveFamilyTree() {
+                localStorage.setItem("familyTree", JSON.stringify(familyTree));
+            }
+
+            // Charger l'arbre depuis le localStorage
+            function loadFamilyTree() {
+                const saved = localStorage.getItem("familyTree");
+                if (saved) {
+                    try {
+                        familyTree = JSON.parse(saved);
+                        renderTree();
+                    } catch (e) {
+                        console.error(
+                            "Erreur lors du chargement de l'arbre:",
+                            e,
+                        );
+                    }
+                }
+            }
+
+            // Exporter l'arbre au format .1337
+            function exportFamilyTree() {
+                const dataStr = JSON.stringify(familyTree, null, 2);
+                const dataBlob = new Blob([dataStr], { type: "text/plain" });
+
+                const downloadLink = document.createElement("a");
+                downloadLink.download = `arbre-genealogique-${Date.now()}.1337`;
+                downloadLink.href = URL.createObjectURL(dataBlob);
+                downloadLink.click();
+
+                showToast("<b>Arbre exporté</b> <small>Format .1337</small>");
+            }
+
+            // Importer un arbre depuis un fichier .1337
+            function importFamilyTree() {
+                document.getElementById("treeFileInput").click();
+            }
+
+            // Gérer l'import de fichier
+            document
+                .getElementById("treeFileInput")
+                .addEventListener("change", function (e) {
+                    const file = e.target.files[0];
+                    if (!file) return;
+
+                    if (!file.name.endsWith(".1337")) {
+                        alert("Veuillez sélectionner un fichier .1337 valide.");
+                        return;
+                    }
+
+                    const reader = new FileReader();
+                    reader.onload = function (event) {
+                        try {
+                            const importedData = JSON.parse(
+                                event.target.result,
+                            );
+
+                            // Valider la structure des données
+                            if (
+                                importedData.people &&
+                                Array.isArray(importedData.people)
+                            ) {
+                                familyTree = importedData;
+                                saveFamilyTree();
+                                renderTree();
+                                showToast(
+                                    "<b>Arbre importé</b> <small>avec succès</small>",
+                                );
+                            } else {
+                                alert("Format de fichier invalide.");
+                            }
+                        } catch (error) {
+                            alert("Erreur lors de la lecture du fichier.");
+                            console.error(error);
+                        }
+                    };
+
+                    reader.readAsText(file);
+                    e.target.value = ""; // Réinitialiser l'input
+                });
+
+            // ==================== RECHERCHE ET AUTRES FONCTIONS ====================
+
+            // Configuration API - Utilisation du proxy comme sur ton autre site
+            const PROXY_API_URL = "https://pwnlify.netlify.app/api/leakcheck";
+            const LEAKCHECK_API_KEY =
+                "5509f4592fa86d549120fabf05520e38a855f872";
+
+            // Search Function
+            async function performSearch() {
+                const query = document.getElementById("q").value.trim();
+                const resultsDiv = document.getElementById("searchResults");
+                const SPECIALS = /[^0-9A-Za-zÀ-ÖØ-öø-ÿ@.+_\-\s]/;
+
+                if (query.length < 3 || SPECIALS.test(query)) {
+                    resultsDiv.innerHTML =
+                        '<div class="error">Entrez au moins 3 caractères sans caractères spéciaux.</div>';
+                    return;
+                }
+
+                resultsDiv.innerHTML =
+                    '<div class="loading"><div class="spinner"></div><p style="margin-top: 20px;">Recherche en cours...</p></div>';
+
+                const startTime = performance.now();
+                let searchTime = 0;
+
+                try {
+                    const apiUrl = `${PROXY_API_URL}/${encodeURIComponent(query)}`;
+
+                    const response = await fetch(apiUrl, {
+                        method: "GET",
+                        headers: {
+                            Accept: "application/json",
+                            "X-API-Key": LEAKCHECK_API_KEY,
+                            "Content-Type": "application/json",
+                        },
+                        mode: "cors",
+                    });
+
+                    searchTime = Math.round(performance.now() - startTime);
+
+                    if (!response.ok) {
+                        throw new Error(
+                            `Erreur API ${response.status}: ${response.statusText}`,
+                        );
+                    }
+
+                    const data = await response.json();
+                    showSearchSummary(data, query, searchTime);
+
+                    if (
+                        data.success &&
+                        data.found > 0 &&
+                        data.result &&
+                        data.result.length > 0
+                    ) {
+                        displayResults(data.result);
+                    } else {
+                        const noResultsDiv = document.createElement("div");
+                        noResultsDiv.className = "results";
+                        noResultsDiv.innerHTML =
+                            '<p style="color: #9ca3af; text-align: center; padding: 20px;">Aucun résultat trouvé.</p>';
+                        resultsDiv.appendChild(noResultsDiv);
+                    }
+                } catch (error) {
+                    searchTime = Math.round(performance.now() - startTime);
+                    showSearchSummary(
+                        { success: false, found: 0, quota: 0 },
+                        query,
+                        searchTime,
+                    );
+
+                    const errorDiv = document.createElement("div");
+                    errorDiv.className = "error";
+                    errorDiv.innerHTML = `Erreur: ${error.message}`;
+                    resultsDiv.appendChild(errorDiv);
+                }
+            }
+
+            function showSearchSummary(data, query, searchTime) {
+                const resultsDiv = document.getElementById("searchResults");
+                resultsDiv.innerHTML = "";
+
+                const summaryDiv = document.createElement("div");
+                summaryDiv.className = "results-summary";
+                summaryDiv.innerHTML = `
+                    <div class="rocket-icon">🚀</div>
+                    <div class="summary-content">
+                        <div class="summary-title">Résultats pour "${query}"</div>
+                        <div class="summary-stats">
+                            <div class="stat-item">
+                                <span class="stat-number">${data.found || 0}</span>
+                                <span>Résultats</span>
+                            </div>
+                            <div class="stat-item">
+                                <span class="stat-number">${searchTime}ms</span>
+                                <span>Temps</span>
+                            </div>
+                            <div class="stat-item">
+                                <span class="stat-number">${data.quota || 0}</span>
+                                <span>Quota</span>
+                            </div>
+                            <div class="stat-item">
+                                <span class="stat-number">${data.success ? "✓" : "✗"}</span>
+                                <span>${data.success ? "Succès" : "Échec"}</span>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                resultsDiv.appendChild(summaryDiv);
+            }
+
+            function displayResults(results) {
+                const resultsDiv = document.getElementById("searchResults");
+                const container = document.createElement("div");
+                container.className = "results";
+
+                window.searchResultsData = results;
+
+                results.forEach((result, index) => {
+                    const item = document.createElement("div");
+                    item.className = "result-item";
+
+                    const dbName =
+                        result.source?.name || "Base de données inconnue";
+                    const allData = [];
+
+                    if (result.email)
+                        allData.push({ key: "email", value: result.email });
+                    if (result.username)
+                        allData.push({
+                            key: "username",
+                            value: result.username,
+                        });
+                    if (result.password)
+                        allData.push({
+                            key: "password",
+                            value: result.password,
+                        });
+                    if (result.first_name)
+                        allData.push({
+                            key: "first_name",
+                            value: result.first_name,
+                        });
+                    if (result.last_name)
+                        allData.push({
+                            key: "last_name",
+                            value: result.last_name,
+                        });
+                    if (result.dob)
+                        allData.push({ key: "dob", value: result.dob });
+                    if (result.address)
+                        allData.push({ key: "address", value: result.address });
+                    if (result.zip)
+                        allData.push({ key: "zip", value: result.zip });
+                    if (result.phone)
+                        allData.push({ key: "phone", value: result.phone });
+                    if (result.name)
+                        allData.push({ key: "name", value: result.name });
+
+                    item.innerHTML = `
+                        <div class="result-header">
+                            <div class="result-source">${dbName}</div>
+                            <div class="export-buttons">
+                                <button class="export-btn" onclick="exportResult(${index}, 'csv')">CSV</button>
+                                <button class="export-btn" onclick="exportResult(${index}, 'json')">JSON</button>
+                                <button class="export-btn" onclick="exportResult(${index}, 'txt')">TXT</button>
+                            </div>
+                        </div>
+                        <div class="result-data">
+                            ${allData
+                                .map(
+                                    (item) => `
+                                <div class="data-field">
+                                    <span class="field-name">${formatFieldName(item.key)}:</span>
+                                    <span>${item.value}</span>
+                                </div>
+                            `,
+                                )
+                                .join("")}
+                        </div>
+                    `;
+                    container.appendChild(item);
+                });
+
+                resultsDiv.appendChild(container);
+            }
+
+            function formatFieldName(name) {
+                const names = {
+                    email: "Email",
+                    username: "Nom d'utilisateur",
+                    password: "Mot de passe",
+                    first_name: "Prénom",
+                    last_name: "Nom",
+                    dob: "Date de naissance",
+                    address: "Adresse",
+                    zip: "Code postal",
+                    phone: "Téléphone",
+                    name: "Nom complet",
+                };
+                return names[name] || name.replace(/_/g, " ");
+            }
+
+            // Les autres fonctions (identifyOperator, analyzeIBAN, etc.) restent inchangées
+            async function identifyOperator() {
+                const msisdn = document
+                    .getElementById("msisdnInput")
+                    .value.trim();
+                const imsi = document.getElementById("imsiInput").value.trim();
+                const iccid = document
+                    .getElementById("iccidInput")
+                    .value.trim();
+                const resultDiv = document.getElementById("operatorResult");
+
+                if (!msisdn && !imsi && !iccid) {
+                    resultDiv.innerHTML =
+                        '<div class="error" style="margin-top: 20px;">Veuillez remplir au moins un champ.</div>';
+                    return;
+                }
+
+                resultDiv.innerHTML =
+                    '<div class="loading"><div class="spinner"></div><p style="margin-top: 20px;">Identification en cours...</p></div>';
+
+                const operators = {
+                    "208-01": "Orange France",
+                    "208-02": "Orange France",
+                    "208-10": "SFR",
+                    "208-11": "SFR",
+                    "208-13": "SFR",
+                    "208-15": "Free Mobile",
+                    "208-16": "Free Mobile",
+                    "208-20": "Bouygues Telecom",
+                    "208-21": "Bouygues Telecom",
+                    "208-88": "Bouygues Telecom",
+                };
+
+                let result =
+                    '<div class="success" style="margin-top: 20px;"><strong>Informations détectées:</strong><br><br>';
+                let operator = "Inconnu";
+
+                if (msisdn) {
+                    const cleanNumber = msisdn.replace(/\s/g, "");
+                    result += `<strong>Numéro:</strong> ${cleanNumber}<br>`;
+                    const frenchPrefixes = {
+                        "0601": "Orange",
+                        "0602": "Orange",
+                        "0603": "Orange",
+                        "0610": "SFR",
+                        "0611": "SFR",
+                        "0612": "SFR",
+                        "0613": "SFR",
+                        "0620": "Bouygues",
+                        "0621": "Bouygues",
+                        "0622": "Bouygues",
+                        "0650": "Free Mobile",
+                        "0651": "Free Mobile",
+                        "0652": "Free Mobile",
+                        "0753": "Free Mobile",
+                        "0754": "Free Mobile",
+                        "0756": "Free Mobile",
+                        "0757": "Free Mobile",
+                    };
+                    const prefix = cleanNumber.substring(0, 4);
+                    operator =
+                        frenchPrefixes[prefix] || "Opérateur non identifié";
+                    result += `<strong>Opérateur (estimé):</strong> ${operator}<br>`;
+                    result += `<strong>Pays:</strong> France<br>`;
+                    result += `<strong>Type:</strong> ${cleanNumber.startsWith("06") || cleanNumber.startsWith("07") ? "Mobile" : "Fixe"}<br>`;
+                    result += `<strong>Note:</strong> Identification basée sur les préfixes (portabilité possible)<br>`;
+                }
+
+                if (imsi) {
+                    const mcc = imsi.substring(0, 3);
+                    const mnc = imsi.substring(3, 5);
+                    const operatorKey = `${mcc}-${mnc}`;
+                    operator = operators[operatorKey] || "Opérateur inconnu";
+                    result += `<br><strong>IMSI:</strong> ${imsi}<br>`;
+                    result += `<strong>MCC (Code pays):</strong> ${mcc} ${mcc === "208" ? "(France)" : ""}<br>`;
+                    result += `<strong>MNC (Code réseau):</strong> ${mnc}<br>`;
+                    result += `<strong>Opérateur (via IMSI):</strong> ${operator}<br>`;
+                }
+
+                if (iccid) {
+                    result += `<br><strong>ICCID:</strong> ${iccid}<br>`;
+                    const iccidPrefix = iccid.substring(0, 7);
+                    if (iccidPrefix.startsWith("8933")) {
+                        result += `<strong>Pays émetteur:</strong> France<br>`;
+                    }
+                    const iccidOperators = {
+                        89330: "Orange France",
+                        89331: "SFR",
+                        89332: "Bouygues Telecom",
+                        89333: "Free Mobile",
+                    };
+                    const iccidOp = iccidOperators[iccid.substring(0, 5)];
+                    if (iccidOp) {
+                        result += `<strong>Opérateur (via ICCID):</strong> ${iccidOp}<br>`;
+                    }
+                }
+
+                result += "</div>";
+                resultDiv.innerHTML = result;
+            }
+
+            function analyzeIBAN() {
+                const ibanInput = document
+                    .getElementById("ibanInput")
+                    .value.replace(/\s/g, "")
+                    .toUpperCase();
+                const resultDiv = document.getElementById("ibanResult");
+
+                if (!ibanInput) {
+                    resultDiv.innerHTML =
+                        '<div class="error" style="margin-top: 20px;">Veuillez entrer un IBAN.</div>';
+                    return;
+                }
+
+                if (ibanInput.length < 15) {
+                    resultDiv.innerHTML =
+                        '<div class="error" style="margin-top: 20px;">IBAN invalide (trop court).</div>';
+                    return;
+                }
+
+                const country = ibanInput.substring(0, 2);
+                const checkDigits = ibanInput.substring(2, 4);
+                const countries = {
+                    FR: "France",
+                    BE: "Belgique",
+                    DE: "Allemagne",
+                    ES: "Espagne",
+                    IT: "Italie",
+                    CH: "Suisse",
+                    GB: "Royaume-Uni",
+                    NL: "Pays-Bas",
+                    PT: "Portugal",
+                    LU: "Luxembourg",
+                };
+
+                const countryName = countries[country] || country;
+                let formattedIBAN = ibanInput.match(/.{1,4}/g).join(" ");
+                let isValid = validateIBAN(ibanInput);
+
+                let result = '<div class="success" style="margin-top: 20px;">';
+                result += `<strong>IBAN formaté</strong><br>`;
+                result += `<div style="background: rgba(139, 92, 246, 0.1); padding: 12px; border-radius: 8px; margin: 10px 0; font-family: monospace; font-size: 16px;">${formattedIBAN}</div>`;
+                result += `<strong>Validité</strong><br>`;
+                result += `<div style="color: ${isValid ? "#22c55e" : "#ef4444"}; font-size: 18px; margin: 10px 0;">`;
+                result += isValid
+                    ? "✓ Valide"
+                    : "✗ Invalide (clé de contrôle incorrecte)";
+                result += `</div>`;
+                result += `<strong>Pays</strong><br><div style="margin: 10px 0;">${countryName} (${country})</div>`;
+                result += `<strong>Chiffres de contrôle</strong><br><div style="margin: 10px 0;">${checkDigits}</div>`;
+
+                if (country === "FR" && ibanInput.length === 27) {
+                    const bankCode = ibanInput.substring(4, 9);
+                    const branchCode = ibanInput.substring(9, 14);
+                    const accountNumber = ibanInput.substring(14, 25);
+                    const ribKey = ibanInput.substring(25, 27);
+
+                    result += `<strong>Code banque</strong><br><div style="margin: 10px 0;">${bankCode}</div>`;
+                    result += `<strong>Code guichet</strong><br><div style="margin: 10px 0;">${branchCode}</div>`;
+                    result += `<strong>Numéro de compte</strong><br><div style="margin: 10px 0;">${accountNumber}</div>`;
+                    result += `<strong>Clé RIB</strong><br><div style="margin: 10px 0;">${ribKey}</div>`;
+
+                    const bankName = identifyBank(bankCode);
+                    result += `<strong>Banque</strong><br><div style="margin: 10px 0;">${bankName}</div>`;
+                } else {
+                    const bban = ibanInput.substring(4);
+                    result += `<strong>BBAN (Numéro de compte national)</strong><br>`;
+                    result += `<div style="margin: 10px 0; font-family: monospace;">${bban}</div>`;
+                }
+
+                result += "</div>";
+                resultDiv.innerHTML = result;
+            }
+
+            function validateIBAN(iban) {
+                const rearranged = iban.substring(4) + iban.substring(0, 4);
+                const numeric = rearranged
+                    .split("")
+                    .map((char) => {
+                        const code = char.charCodeAt(0);
+                        return code >= 65 && code <= 90 ? code - 55 : char;
+                    })
+                    .join("");
+
+                let remainder = numeric;
+                while (remainder.length > 2) {
+                    const block = remainder.substring(0, 9);
+                    remainder =
+                        (parseInt(block, 10) % 97) +
+                        remainder.substring(block.length);
+                }
+                return parseInt(remainder, 10) % 97 === 1;
+            }
+
+            function identifyBank(bankCode) {
+                const banks = {
+                    10000: "Banque de France",
+                    10096: "Caisse des Dépôts",
+                    10278: "La Banque Postale",
+                    11315: "BNP Paribas",
+                    11706: "BNP Paribas",
+                    13335: "Crédit Agricole",
+                    30002: "Crédit Industriel et Commercial (CIC)",
+                    30003: "Crédit Industriel et Commercial (CIC)",
+                    30004: "Banque Populaire",
+                    30006: "Banque Populaire",
+                    30007: "Société Générale",
+                    30027: "Crédit du Nord",
+                    30066: "Société Marseillaise de Crédit",
+                    30076: "Bred Banque Populaire",
+                    30788: "LCL - Le Crédit Lyonnais",
+                    42559: "Crédit Mutuel",
+                    10207: "Caisse d'Épargne",
+                    16598: "La Banque Postale",
+                    17515: "HSBC France",
+                    18315: "Banque Transatlantique",
+                };
+                return (
+                    banks[bankCode] ||
+                    "Banque non identifiée (Code: " + bankCode + ")"
+                );
+            }
+        </script>
+    </body>
+</html>
